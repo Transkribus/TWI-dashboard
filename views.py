@@ -12,7 +12,7 @@ import collections
 
 from apps.utils.decorators import t_login_required_ajax
 from apps.utils.services import *
-from apps.utils.utils import t_log
+from apps.utils.utils import get_ts_session, t_log
 import settings
 import apps.dashboard.settings
 from apps.navigation import navigation
@@ -34,7 +34,7 @@ from apps.querystring_parser.querystring_parser import parser
 # dashboard/index is the dashboard for that logged in user. Will show actions, collections and metrics for that user
 @login_required
 def index(request):
-    t = request.user.tsdata.t
+    t = get_ts_session(request)
     
     last_actions = t.actions(request,{'nValues' : 5,  'userid': request.user.tsdata.userId, 'typeId': 4 })
     if isinstance(last_actions,HttpResponse):
@@ -68,7 +68,7 @@ def index(request):
 
 @login_required
 def d_collection(request,collId):
-    t = request.user.tsdata.t
+    t = get_ts_session(request)
  
     last_actions = t.actions(request,{'nValues' : 5, 'collId' : collId, 'userid': request.user.tsdata.userId, 'typeId': 4 })
     if isinstance(last_actions,HttpResponse):
@@ -112,7 +112,7 @@ def d_collection(request,collId):
 
 @login_required
 def d_document(request,collId,docId):
-    t = request.user.tsdata.t
+    t = get_ts_session(request)
 
     last_actions = t.actions(request,{'nValues' : 5, 'collId' : collId, 'docId' : docId, 'userid': request.user.tsdata.userId, 'typeId': 4  })
     if isinstance(last_actions,HttpResponse):
@@ -176,7 +176,7 @@ def d_document(request,collId,docId):
 # dashboard{collId}/u/{username} is the dashboard for that user. Will show actions, collections and metrics for that user, can only be accessed by collection owners (editors?)
 @login_required
 def d_user(request,collId,username):
-    t = request.user.tsdata.t
+    t = get_ts_session(request)
     # If the logged in user is owner of collection collId then (and username is a member)
     # Then we get relevant data about that user+collection and make dashboard view
     t_log("##################### USERNAME: %s " % username, logging.WARN)
@@ -206,7 +206,7 @@ def d_user(request,collId,username):
 
 def paged_data(request,list_name,params=None):#collId=None,docId=None):
 
-    t = request.user.tsdata.t
+    t = get_ts_session(request)
 
     #collect params from request into dict
     dt_params = parser.parse(request.GET.urlencode())
