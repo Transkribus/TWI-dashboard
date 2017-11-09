@@ -12,7 +12,8 @@ import collections
 
 from apps.utils.decorators import t_login_required_ajax
 from apps.utils.services import *
-from apps.utils.utils import get_ts_session, t_log
+from apps.utils.utils import t_log, get_ts_session
+from apps.utils.views import error_view
 import settings
 import apps.dashboard.settings
 from apps.navigation import navigation
@@ -34,7 +35,10 @@ from apps.querystring_parser.querystring_parser import parser
 # dashboard/index is the dashboard for that logged in user. Will show actions, collections and metrics for that user
 @login_required
 def index(request):
-    t = get_ts_session(request)
+    # Get the transkribus session instance
+    t = get_ts_session(request) 
+    if isinstance(t,HttpResponse) :
+        return error_view(request,t)
     
     last_actions = t.actions(request,{'nValues' : 5,  'userid': request.user.tsdata.userId, 'typeId': 4 })
     if isinstance(last_actions,HttpResponse):
@@ -68,7 +72,11 @@ def index(request):
 
 @login_required
 def d_collection(request,collId):
-    t = get_ts_session(request)
+    # Get the transkribus session instance
+    t = get_ts_session(request) 
+    if isinstance(t,HttpResponse) :
+        return error_view(request,t)
+
  
     last_actions = t.actions(request,{'nValues' : 5, 'collId' : collId, 'userid': request.user.tsdata.userId, 'typeId': 4 })
     if isinstance(last_actions,HttpResponse):
@@ -112,7 +120,12 @@ def d_collection(request,collId):
 
 @login_required
 def d_document(request,collId,docId):
-    t = get_ts_session(request)
+    # Get the transkribus session instance
+    t = get_ts_session(request) 
+    if isinstance(t,HttpResponse) :
+        return error_view(request,t)
+
+
 
     last_actions = t.actions(request,{'nValues' : 5, 'collId' : collId, 'docId' : docId, 'userid': request.user.tsdata.userId, 'typeId': 4  })
     if isinstance(last_actions,HttpResponse):
@@ -176,7 +189,11 @@ def d_document(request,collId,docId):
 # dashboard{collId}/u/{username} is the dashboard for that user. Will show actions, collections and metrics for that user, can only be accessed by collection owners (editors?)
 @login_required
 def d_user(request,collId,username):
-    t = get_ts_session(request)
+    # Get the transkribus session instance
+    t = get_ts_session(request) 
+    if isinstance(t,HttpResponse) :
+        return error_view(request,t)
+
     # If the logged in user is owner of collection collId then (and username is a member)
     # Then we get relevant data about that user+collection and make dashboard view
     t_log("##################### USERNAME: %s " % username, logging.WARN)
@@ -206,7 +223,10 @@ def d_user(request,collId,username):
 
 def paged_data(request,list_name,params=None):#collId=None,docId=None):
 
-    t = get_ts_session(request)
+    # Get the transkribus session instance
+    t = get_ts_session(request) 
+    if isinstance(t,HttpResponse) :
+        return error_view(request,t)
 
     #collect params from request into dict
     dt_params = parser.parse(request.GET.urlencode())
